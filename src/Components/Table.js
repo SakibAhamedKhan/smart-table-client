@@ -14,6 +14,7 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 post: action.data,
+                showPost: action.data,
                 savedForUse: action.data,
             };
         case 'PAGINATION':
@@ -33,9 +34,20 @@ const reducer = (state, action) => {
                 post: searchPost,
                 
             };
-
+        case 'FILTER':
+            const postF = action.data;
+            const filterType = action.filter;
+            let filteredPost = postF.filter( p => p.completed.toString() === filterType);
+            if(filteredPost.length===0){
+                filteredPost = [...postF];
+            }
+            console.log(filteredPost);
+            return {
+                ...state,
+                post: filteredPost,
+            };
         default:
-            break;
+            return state;
     }
 }
 
@@ -46,6 +58,7 @@ const Table = () => {
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
     const [fatcing, setFatching] = useState(false);
+    const [refresh, setRefresh] = useState('');
 
     useEffect(() => {
         fetch('https://jsonplaceholder.typicode.com/todos')
@@ -58,14 +71,15 @@ const Table = () => {
 
     useEffect(() => {
         dispatch({type: 'PAGINATION', data: post.post, page: page, size: size})
-    },[countPage,page,fatcing,size]);
+    },[countPage,page,fatcing,size,post.post.length]);
 
     useEffect(() => {
         const  count = post.post.length;
         const pages = Math.ceil(count/size);
         setCountPage(pages);
         console.log(count);  
-    }, [size, post]);
+        console.log('pages', pages);
+    }, [size, post.post.length, refresh]);
 
    
 
@@ -78,27 +92,33 @@ const Table = () => {
                 <select onChange={event => {
                     setSize(event.target.value);
                     setPage(0);
-                }} class="select select-bordered select-sm w-fit mx-1 my-1">
+                }} className="select select-bordered select-sm w-fit mx-1 my-1">
                     <option value='10'>Show 10</option>
                     <option value='15'>Show 15</option>
                     <option value='20'>Show 20</option>
                     <option value='50'>Show 50</option>
                     <option value='100'>Show 100</option>
                 </select>
-                <input onChange={event => {
+
+                <input id='search' onChange={event => {
                     const search = event.target.value;
                     dispatch({type: 'SEARCH', data: post.savedForUse, search:search});
-                }} type="text" placeholder="Search task here..." class="input input-bordered input-sm max-w-xs mx-1 my-1" />
-                <select onChange={event => {
-                }} class="select select-bordered select-sm w-fit mx-1 my-1">
-                    <option value='all'>All Task</option>
-                    <option value='completed'>Completed</option>
-                    <option value='notCompleted'>Not Completed</option>
-                </select>
+                    document.getElementById('filter').value='all';
+                    setRefresh(new Date().getTime());
+                }} type="text" placeholder="Search task here..." className="input input-bordered input-sm max-w-xs mx-1 my-1" />
 
+                <select id='filter' onChange={event => {
+                    dispatch({type: 'FILTER', data: post.savedForUse, filter: event.target.value});
+                    document.getElementById('search').value ='';
+                }} className="select select-bordered select-sm w-fit mx-1 my-1">
+                    <option value='all'>All Task</option>
+                    <option value='true'>Completed</option>
+                    <option value='false'>Not Completed</option>
+                </select>
             </div>
-            <div class="overflow-x-auto w-full">
-                <table class="table mx-auto">
+            
+            <div className="overflow-x-auto w-full">
+                <table className="table mx-auto">
                     <thead >
                         <tr>
                             <th className='max-w-20'>
@@ -118,7 +138,7 @@ const Table = () => {
                         }
                     </tbody>
                 </table>
-               
+              
             </div>
            <div className='my-5 flex justify-center flex-wrap justify-center'>
             {
@@ -126,7 +146,6 @@ const Table = () => {
                      onClick={() => setPage(btn)}
                      className={`m-1 btn btn-sm ${btn===page? '':'btn-outline'}`}
                      key={btn}
-                     
                     >{btn + 1}</button>)
             }
            </div>

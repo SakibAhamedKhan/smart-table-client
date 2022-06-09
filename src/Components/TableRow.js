@@ -1,12 +1,13 @@
 import React from 'react';
 import { BsFillExclamationCircleFill,BsFillCheckCircleFill } from "react-icons/bs";
 
-const TableRow = ({ post }) => {
+const TableRow = ({ post, index }) => {
     return (
         <tr>
             <th className='max-w-20'>
                 {post.id}
             </th>
+            
             <th className='text-center max-w-20'>
                {
                     (post.completed)?
@@ -33,5 +34,3 @@ const TableRow = ({ post }) => {
 };
 
 export default TableRow;
-//BsFillDashCircleFill
-//BsFillCheckCircleFill
