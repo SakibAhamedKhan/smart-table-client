@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer, useState } from 'react';
+import TableRow from './TableRow';
 
 const initialStateOfPost = {
     post: [],
@@ -75,18 +76,15 @@ const Table = () => {
                 <option value='100'>100</option>
             </select>
             <div class="overflow-x-auto w-full">
-                <table class="table w-full">
-                    <thead>
+                <table class="table mx-auto">
+                    <thead >
                         <tr>
-                            <th>
-                                <label>
-                                    <input type="checkbox" class="checkbox" />
-                                </label>
+                            <th className='w-20'>
+                                No.
                             </th>
-                            <th>Name</th>
-                            <th>Job</th>
-                            <th>Favorite Color</th>
-                            <th></th>
+                            <th className='w-20'>Status</th>
+                            <th className='w-96'>Task Name</th>
+                            <th className='w-40'>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -118,18 +116,26 @@ const Table = () => {
                                 <button class="btn btn-ghost btn-xs">details</button>
                             </th>
                         </tr> */}
-
+                        {
+                            post.paginatedPost.map(p => <TableRow
+                                key={p.id}
+                                post = {p}
+                            ></TableRow>)
+                        }
                     </tbody>
                 </table>
-                {
+               
+            </div>
+           <div className='my-5'>
+           {
                     [...Array(countPage).keys()].map( btn => <button
                      onClick={() => setPage(btn)}
-                     className={`btn btn-sm ${btn===page? '':'btn-outline'} mx-1`}
+                     className={`btn btn-sm ${btn===page? '':'btn-outline'} mx-1 `}
                      key={btn}
                      
                     >{btn + 1}</button>)
-                }
-            </div>
+            }
+           </div>
         </div>
     );
 };
