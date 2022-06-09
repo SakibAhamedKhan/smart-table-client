@@ -4,6 +4,7 @@ import TableRow from './TableRow';
 const initialStateOfPost = {
     post: [],
     paginatedPost: [],
+    savedForUse: [],
 }
 
 
@@ -13,17 +14,25 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 post: action.data,
+                savedForUse: action.data,
             };
         case 'PAGINATION':
-            const post = action.data;
-            console.log( action.page*action.size, action.page*action.size + action.size);
-            console.log( parseInt(action.page)*parseInt(action.size), parseInt(action.page)*parseInt(action.size) + parseInt(action.size));
-            const paginatedPost = post.slice(parseInt(action.page)*parseInt(action.size), parseInt(action.page)*parseInt(action.size) + parseInt(action.size));
-            console.log(post);
+            const postP = action.data;
+            const paginatedPost = postP.slice(parseInt(action.page)*parseInt(action.size), parseInt(action.page)*parseInt(action.size) + parseInt(action.size));
             return {
                 ...state,
                 paginatedPost: paginatedPost,
             }
+        case 'SEARCH':
+            const searchText = action.search;
+            const postS = action.data;
+            const searchPost = postS.filter( p => p.title.includes(searchText));
+            console.log(searchPost);
+            return {
+                ...state,
+                post: searchPost,
+                
+            };
 
         default:
             break;
@@ -49,7 +58,7 @@ const Table = () => {
 
     useEffect(() => {
         dispatch({type: 'PAGINATION', data: post.post, page: page, size: size})
-    },[page,fatcing, size]);
+    },[countPage,page,fatcing,size]);
 
     useEffect(() => {
         const  count = post.post.length;
@@ -64,58 +73,43 @@ const Table = () => {
     console.log(post.paginatedPost);
     return (
         <div className=' px-4 md:px-8 lg:px-10'>
-            <h2 className='my-5 text-2xl font-semibold'>My Todo Table</h2>
-            <select onChange={event => {
-                setSize(event.target.value);
-                setPage(0);
-            }} class="select select-bordered w-fit ">
-                <option value='10'>10</option>
-                <option value='15'>15</option>
-                <option value='20'>20</option>
-                <option value='50'>50</option>
-                <option value='100'>100</option>
-            </select>
+            <h2 className='my-5 text-2xl font-semibold text-center'>My ToDo Table</h2>
+            <div className='flex justify-center flex-wrap mt-5 mb-2'>
+                <select onChange={event => {
+                    setSize(event.target.value);
+                    setPage(0);
+                }} class="select select-bordered select-sm w-fit mx-1 my-1">
+                    <option value='10'>Show 10</option>
+                    <option value='15'>Show 15</option>
+                    <option value='20'>Show 20</option>
+                    <option value='50'>Show 50</option>
+                    <option value='100'>Show 100</option>
+                </select>
+                <input onChange={event => {
+                    const search = event.target.value;
+                    dispatch({type: 'SEARCH', data: post.savedForUse, search:search});
+                }} type="text" placeholder="Search task here..." class="input input-bordered input-sm max-w-xs mx-1 my-1" />
+                <select onChange={event => {
+                }} class="select select-bordered select-sm w-fit mx-1 my-1">
+                    <option value='all'>All Task</option>
+                    <option value='completed'>Completed</option>
+                    <option value='notCompleted'>Not Completed</option>
+                </select>
+
+            </div>
             <div class="overflow-x-auto w-full">
                 <table class="table mx-auto">
                     <thead >
                         <tr>
-                            <th className='w-20'>
+                            <th className='max-w-20'>
                                 No.
                             </th>
-                            <th className='w-20'>Status</th>
-                            <th className='w-96'>Task Name</th>
-                            <th className='w-40'>Action</th>
+                            <th className='max-w-20'>Status</th>
+                            <th className='max-w-96'>Task Name</th>
+                            <th className='max-w-40'>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {/* <tr>
-                            <th>
-                                <label>
-                                    <input type="checkbox" class="checkbox" />
-                                </label>
-                            </th>
-                            <td>
-                                <div class="flex items-center space-x-3">
-                                    <div class="avatar">
-                                        <div class="mask mask-squircle w-12 h-12">
-                                            <img src="/tailwind-css-component-profile-2@56w.png" alt="Avatar Tailwind CSS Component" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold">Hart Hagerty</div>
-                                        <div class="text-sm opacity-50">United States</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <br />
-                                <span class="badge badge-ghost badge-sm">Desktop Support Technician</span>
-                            </td>
-                            <td>Purple</td>
-                            <th>
-                                <button class="btn btn-ghost btn-xs">details</button>
-                            </th>
-                        </tr> */}
                         {
                             post.paginatedPost.map(p => <TableRow
                                 key={p.id}
@@ -126,11 +120,11 @@ const Table = () => {
                 </table>
                
             </div>
-           <div className='my-5'>
-           {
+           <div className='my-5 flex justify-center flex-wrap justify-center'>
+            {
                     [...Array(countPage).keys()].map( btn => <button
                      onClick={() => setPage(btn)}
-                     className={`btn btn-sm ${btn===page? '':'btn-outline'} mx-1 `}
+                     className={`m-1 btn btn-sm ${btn===page? '':'btn-outline'}`}
                      key={btn}
                      
                     >{btn + 1}</button>)
