@@ -57,7 +57,7 @@ const Table = () => {
     const [countPage, setCountPage] = useState(0);
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
-    const [fatcing, setFatching] = useState(false);
+    const [fatcing, setFatching] = useState('');
     const [refresh, setRefresh] = useState('');
 
     useEffect(() => {
@@ -65,13 +65,13 @@ const Table = () => {
             .then(res => res.json())
             .then(data => {
                 dispatch({ type: 'SUCESS', data: data });
-                setFatching(true);
+                setFatching(new Date().getTime());
             });
     }, [])
 
     useEffect(() => {
         dispatch({type: 'PAGINATION', data: post.post, page: page, size: size})
-    },[countPage,page,fatcing,size,post.post.length]);
+    },[countPage,page,fatcing,size,post.post.length,refresh]);
 
     useEffect(() => {
         const  count = post.post.length;
@@ -84,7 +84,9 @@ const Table = () => {
    
 
     console.log(post.post.length);
-    console.log(post.paginatedPost);
+    console.log(post.paginatedPost.length);
+
+   
     return (
         <div className=' px-4 md:px-8 lg:px-10'>
             <h2 className='my-5 text-2xl font-semibold text-center'>My ToDo Table</h2>
@@ -131,7 +133,7 @@ const Table = () => {
                     </thead>
                     <tbody>
                         {
-                            post.paginatedPost.map(p => <TableRow
+                            post.paginatedPost?.map(p => <TableRow
                                 key={p.id}
                                 post = {p}
                             ></TableRow>)
