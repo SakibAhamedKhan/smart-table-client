@@ -107,6 +107,7 @@ const Table = () => {
                     dispatch({type: 'SEARCH', data: post.savedForUse, search:search});
                     document.getElementById('filter').value='all';
                     setRefresh(new Date().getTime());
+                    setPage(0);
                 }} type="text" placeholder="Search task here..." className="input input-bordered input-sm max-w-xs mx-1 my-1" />
 
                 <select id='filter' onChange={event => {
